@@ -1,0 +1,7 @@
+language: go
+go:
+  - 1.10.x
+install:
+  - go get -u github.com/golang/dep/...
+  - dep ensure
+script: go test -v `go list ./... | grep -v examples`
