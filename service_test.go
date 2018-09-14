@@ -1,7 +1,6 @@
 package arukas
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -10,7 +9,7 @@ import (
 	"github.com/dopin/jsonapi"
 )
 
-const json = `{
+const manyAppsSideLoadedResponseJson = `{
   "data": [
     {
       "id": "126cd38b-371d-451a-8965-b84f1215ddfb",
@@ -78,16 +77,7 @@ const json = `{
             "value": "aaaaa"
           }
         ],
-        "ports": [
-          {
-            "number": 6379,
-            "protocol": "tcp"
-          },
-          {
-            "number": 80,
-            "protocol": "udp"
-          }
-        ],
+		"ports": ["6379/tcp", "80/udp"],
         "port-mappings": null,
         "created-at": "2018-03-29T09:20:01.715Z",
         "updated-at": "2018-06-08T02:18:11.942Z",
@@ -124,16 +114,7 @@ const json = `{
         "cpus": 0.1,
         "memory": null,
         "environment": null,
-        "ports": [
-          {
-            "number": 80,
-            "protocol": "tcp"
-          },
-          {
-            "number": 443,
-            "protocol": "tcp"
-          }
-        ],
+        "ports": ["80","443"],
         "port-mappings": null,
         "created-at": "2018-03-29T09:12:29.687Z",
         "updated-at": "2018-06-07T08:39:57.936Z",
@@ -171,7 +152,7 @@ const json = `{
 `
 
 func TestUnmarshaServiceManyPayloadSideLoaded(t *testing.T) {
-	r := strings.NewReader(json)
+	r := strings.NewReader(manyAppsSideLoadedResponseJson)
 	data, err := jsonapi.UnmarshalManyPayload(r, reflect.TypeOf(new(App)))
 
 	if err != nil {
@@ -260,16 +241,7 @@ func TestUnmarshalServicePayload(t *testing.T) {
             "value": "aaaaa"
           }
         ],
-        "ports": [
-          {
-            "number": 6379,
-            "protocol": "tcp"
-          },
-          {
-            "number": 80,
-            "protocol": "udp"
-          }
-        ],
+        "ports": ["6379/tcp", "80/udp"],
         "port-mappings": null,
         "created-at": "2018-03-29T09:20:01.715Z",
         "updated-at": "2018-06-08T02:18:11.942Z",
@@ -303,8 +275,6 @@ func TestUnmarshalServicePayload(t *testing.T) {
 
 	if err != nil {
 		t.Fatal(err)
-	} else {
-		fmt.Println(service.Image)
 	}
 
 }
