@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	arukas "github.com/dopin/arukas-resources-go"
+	arukas "github.com/dopin/arukas-go"
 )
 
 func main() {

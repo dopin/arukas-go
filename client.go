@@ -77,14 +77,24 @@ func NewClient() (*Client, error) {
 	return client, nil
 }
 
-func (client *Client) newRequest(method string, path string) (*http.Request, error) {
+func (client *Client) newRequest(method string, path string, resource interface{}) (*http.Request, error) {
 	var req *http.Request
 	var err error
+	var marshaled *bytes.Buffer
+
+	if resource != nil {
+		marshaled = bytes.NewBuffer(nil)
+		err = jsonapi.MarshalPayload(marshaled, resource)
+	}
+
+	if err != nil {
+		return nil, err
+	}
 
 	requestURL := *client.APIURL
 	requestURL.Path += path
 
-	if req, err = http.NewRequest(method, requestURL.String(), nil); err != nil {
+	if req, err = http.NewRequest(method, requestURL.String(), marshaled); err != nil {
 		return nil, err
 	}
 
@@ -100,6 +110,7 @@ func (client *Client) newRequest(method string, path string) (*http.Request, err
 			fmt.Fprintln(os.Stderr, ": "+strings.Join(v, ","))
 		}
 		fmt.Fprintln(os.Stderr, requestURL.String())
+		fmt.Fprintln(os.Stderr, marshaled.String())
 	}
 
 	return req, nil
@@ -142,10 +153,30 @@ func unmarshalManyPayload(responseBody []byte, resource reflect.Type) ([]interfa
 	return jsonapi.UnmarshalManyPayload(bytes.NewReader(responseBody), resource)
 }
 
+// CreateApp requests to API to create an app with service with given parameters.
+func (client *Client) CreateApp(app *App) (*App, error) {
+
+	req, err := client.newRequest("POST", endpointApps, app)
+	responseBody, err := client.request(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	createdApp := new(App)
+	err = jsonapi.UnmarshalPayload(bytes.NewReader(responseBody), createdApp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createdApp, nil
+}
+
 // GetApps returns a list of Arukas apps.
 func (client *Client) GetApps() (Apps, error) {
 	var err error
-	req, err := client.newRequest("GET", endpointApps)
+	req, err := client.newRequest("GET", endpointApps, nil)
 
 	if err != nil {
 		return nil, err
@@ -174,7 +205,7 @@ func (client *Client) GetApps() (Apps, error) {
 // GetApp returns an Arukas app.
 func (client *Client) GetApp(uuid string) (*App, error) {
 	var err error
-	req, err := client.newRequest("GET", fmt.Sprintf(endpointApp, uuid))
+	req, err := client.newRequest("GET", fmt.Sprintf(endpointApp, uuid), nil)
 
 	if err != nil {
 		return nil, err
@@ -194,7 +225,7 @@ func (client *Client) GetApp(uuid string) (*App, error) {
 // GetService returns an Arukas service.
 func (client *Client) GetService(uuid string) (*Service, error) {
 	var err error
-	req, err := client.newRequest("GET", fmt.Sprintf(endpointService, uuid))
+	req, err := client.newRequest("GET", fmt.Sprintf(endpointService, uuid), nil)
 
 	if err != nil {
 		return nil, err
@@ -214,7 +245,7 @@ func (client *Client) GetService(uuid string) (*Service, error) {
 // GetServices returns a list of Arukas services.
 func (client *Client) GetServices() (Services, error) {
 	var err error
-	req, err := client.newRequest("GET", endpointServices)
+	req, err := client.newRequest("GET", endpointServices, nil)
 
 	if err != nil {
 		return nil, err

@@ -29,6 +29,16 @@ type Port struct {
 	Number   int    `json:"number"`
 }
 
+func (port *Port) MarshalJSON() ([]byte, error) {
+	str := strconv.Itoa(port.Number)
+
+	if port.Protocol == "udp" {
+		str += "/udp"
+	}
+
+	return []byte(`"` + str + `"`), nil
+}
+
 type Ports []*Port
 
 func (ports *Ports) UnmarshalJSON(data []byte) error {
@@ -41,19 +51,6 @@ func (ports *Ports) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (ports *Ports) MarshalJSON() ([]byte, error) {
-	marshaled := make([]byte, 0)
-
-	for _, port := range *ports {
-		marshaled = append(marshaled, byte(port.Number))
-		if port.Protocol == "udp" {
-			marshaled = append(marshaled, []byte("/udp")...)
-		}
-	}
-
-	return marshaled, nil
 }
 
 func parsePortFormat(str string) (*Port, error) {
@@ -92,20 +89,20 @@ func (pf APIPortFormat) toPorts() (Ports, error) {
 }
 
 type Service struct {
-	ArukasDomain string       `jsonapi:"attr,arukas-domain"`
+	ClientID     string       `jsonapi:"lid"`
 	Command      string       `jsonapi:"attr,command"`
-	Endpoint     string       `jsonapi:"attr,endpoint"`
+	Endpoint     string       `jsonapi:"attr,endpoint,readonly"`
 	Environment  Environment  `jsonapi:"attr,environment"`
 	ID           string       `jsonapi:"primary,services"`
 	Image        string       `jsonapi:"attr,image"`
 	Instances    int          `jsonapi:"attr,instances"`
 	Ports        Ports        `jsonapi:"attr,ports"`
-	PortMappings PortMappings `jsonapi:"attr,port-mappings,omitempty"`
+	PortMappings PortMappings `jsonapi:"attr,port-mappings,readonly"`
 	ServicePlan  *ServicePlan `jsonapi:"relation,service-plan"`
 	Subdomain    string       `jsonapi:"attr,subdomain"`
-	Status       string       `jsonapi:"attr,status"`
-	CreatedAt    time.Time    `jsonapi:"attr,created-at,iso8601"`
-	UpdatedAt    time.Time    `jsonapi:"attr,updated-at,iso8601"`
+	Status       string       `jsonapi:"attr,status,readonly"`
+	CreatedAt    time.Time    `jsonapi:"attr,created-at,iso8601,readonly"`
+	UpdatedAt    time.Time    `jsonapi:"attr,updated-at,iso8601,readonly"`
 }
 
 type Services []*Service

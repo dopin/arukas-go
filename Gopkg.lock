@@ -3,13 +3,15 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:4457fef77af0dedbd5f8f7e2b667be374b9130a20bd1ddeec758d937d4dd4789"
   name = "github.com/dopin/jsonapi"
   packages = ["."]
-  revision = "e5984fda5c4b9ede72ef942ba73c00aa4a2009a2"
+  pruneopts = "UT"
+  revision = "b621ca6c494ca5c5e1381381fea1bb7cdb8d7c9d"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1ac6dbdd278925e1643aadf2cc785c63b2104ed71a1fec2df70815e236a17719"
+  input-imports = ["github.com/dopin/jsonapi"]
   solver-name = "gps-cdcl"
   solver-version = 1
