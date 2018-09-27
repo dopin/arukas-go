@@ -1,6 +1,7 @@
 package arukas
 
 import (
+	"bytes"
 	"reflect"
 	"strings"
 	"testing"
@@ -277,4 +278,31 @@ func TestUnmarshalServicePayload(t *testing.T) {
 		t.Fatal(err)
 	}
 
+}
+
+func TestMarshalSingleService(t *testing.T) {
+	service := &Service{
+		ClientID: "1",
+		Image:    "nginx",
+		Ports: Ports{
+			&Port{
+				Protocol: "tcp",
+				Number:   80,
+			},
+		},
+		Environment: Environment{
+			&Env{
+				Key:   "FOO",
+				Value: "bar",
+			},
+		},
+	}
+
+	out := bytes.NewBuffer(nil)
+
+	err := jsonapi.MarshalPayload(out, service)
+
+	if err != nil {
+		t.Fatal(err)
+	}
 }

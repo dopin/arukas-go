@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	arukas "github.com/dopin/arukas-resources-go"
+	arukas "github.com/dopin/arukas-go"
 )
 
 func main() {
